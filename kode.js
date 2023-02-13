@@ -1,13 +1,21 @@
 /* Globale Variabler */
 
-var date = new Date();
-
 var settings = { //Indstillinger der bør justeres til hver enkelt restaurant.
     breakHour: 4.5, //Hvor mange timer skal man have før man skal have en  (betalt) pause.
     breakDuration: 0.5, //Hvor lange er pauser, i timer?
     pauseRoller: ["Medarbejder"], //Hvilke roller skal have (ikke betalte) pauser, hvis de arbejder nok timer?
     shiftSwitch: "16:00", //Hvornår på dagen skifter man fra morgen skift til aften skift?
 }
+
+    var date = new Date();
+
+    var hoursMorning = 0; //Antal timer brugt om morgenen.
+    var hoursEvening = 0; //Antal timer brugt om aftenen.
+    var hoursSum = 0; //Antal timer brugt hele dagen.
+    
+    var plannedHoursMorning = 0;
+    var plannedHoursEvening = 0;
+    var plannedHoursSum = 0;
 
 
 function minToHour(val) { //Konverter et antal minutter til timer.
@@ -55,18 +63,35 @@ function hasBreak(object, duration) { //Skal medarbejderen have en pause?
     return result;
 }
 
+function addUIbutton() {
+    var object = document.createElement("a");
+    object.setAttribute("class", "nav-menu-button false");
+
+    var button = document.createElement("button");
+    button.setAttribute("class", "navbar-button text-uppercase button-default");
+    button.innerText = "Time Beregninger";
+    button.addEventListener("click", function() {
+        calculateHours();
+        alert("(Morgenskift)\nTimer Brugt: " + hoursMorning.toFixed(2) + " | Planlagte timer: " + plannedHoursMorning.toFixed(2) + " | Procent: " + (hoursMorning / plannedHoursMorning * 100).toFixed(2) + "\n\n(Aftenskift)\nTimer Brugt: " + hoursEvening.toFixed(2) + " | Planlagte timer: " + plannedHoursEvening.toFixed(2) + " | Procent: " + (hoursEvening / plannedHoursEvening * 100).toFixed(2) + "\n\n(Hele dagen)\nTimer Brugt: " + hoursSum.toFixed(2) + " | Planlagte timer: " + plannedHoursSum.toFixed(2) + " | Procent: " + (hoursSum / plannedHoursSum * 100).toFixed(2));
+    })
+
+    object.appendChild(button);
+
+    document.querySelector("#app-container > div > div > div > div > div:nth-child(1) > div.flex.nav-menu-content.closed > div:nth-child(1)").appendChild(object);
+}
+
 function calculateHours() { //Lav de nødvendige beregninger, og send manageren informationer omkring timerne.
 
     var punches = document.getElementsByClassName("schedulerPunch"); //Indstemplinger.
     var shifts = document.getElementsByClassName("scheduler-shift"); //Planlagte vagter.
     
-    var hoursMorning = 0; //Antal timer brugt om morgenen.
-    var hoursEvening = 0; //Antal timer brugt om aftenen.
-    var hoursSum = 0; //Antal timer brugt hele dagen.
+    hoursMorning = 0; //Antal timer brugt om morgenen.
+    hoursEvening = 0; //Antal timer brugt om aftenen.
+    hoursSum = 0; //Antal timer brugt hele dagen.
     
-    var plannedHoursMorning = 0;
-    var plannedHoursEvening = 0;
-    var plannedHoursSum = 0;
+    plannedHoursMorning = 0;
+    plannedHoursEvening = 0;
+    plannedHoursSum = 0;
 
 for (var i = 0; i < punches.length;i++) { //Loopet finder ud af hvor mange timer der er brugt i løbet af dagen.
     if (punches[i].children[0].children[0].children[0].innerText != "Punch missing") {
@@ -127,11 +152,7 @@ for (var i = 0; i < shifts.length;i++) {
 
 hoursSum = hoursMorning + hoursEvening;
 
-/* Giv feedback til manageren */
-console.log("(Morgen Timer) Brugt: " + hoursMorning.toFixed(2) + " | Planlagt: " + plannedHoursMorning.toFixed(2) + " | Procent: " + (hoursMorning / plannedHoursMorning * 100).toFixed(2));
-console.log("(Aften Timer) Brugt: " + hoursEvening.toFixed(2) + " | Planlagt: " + plannedHoursEvening.toFixed(2) + " | Procent: " + (hoursEvening / plannedHoursEvening * 100).toFixed(2));
-console.log("(Timer hele dag) Brugt: " + hoursSum.toFixed(2) + " | Planlagt: " + plannedHoursSum.toFixed(2) + " | Procent: " + (hoursSum / plannedHoursSum * 100).toFixed(2));
-
 }
 console.warn("Velkommen til automatiske time beregniner.\n\nKun indstemplede timer er inkluderet. Vær opmærksom på at de planlagte (skemalagte) timer er EKSKLUSIV pauser. Det vil sige, at hvis der er skemalagte pauser, så er de automatisk blevet fjernet fra time antallet.\n\nDe brugte timer er også EKSKLUSIV pauser, så de er allerede fjernet; derfor behøves du ikke at gøre mere.\n\nGenberegn ved at skrive 'calculateHours()' uden '', her i konsollen.\n\n(Udviklet af André Daugaard Nielsen)");
 calculateHours();
+addUIbutton();
