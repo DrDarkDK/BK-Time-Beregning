@@ -5,6 +5,7 @@ var settings = { //Indstillinger der bør justeres til hver enkelt restaurant.
     breakDuration: 0.5, //Hvor lange er pauser, i timer?
     pauseRoller: ["Medarbejder"], //Hvilke roller skal have (ikke betalte) pauser, hvis de arbejder nok timer?
     shiftSwitch: "16:00", //Hvornår på dagen skifter man fra morgen skift til aften skift?
+    ignoredAbsence: ["Ferie", "Ønsket fri"],
 }
 
     var date = new Date();
@@ -16,6 +17,8 @@ var settings = { //Indstillinger der bør justeres til hver enkelt restaurant.
     var plannedHoursMorning = 0;
     var plannedHoursEvening = 0;
     var plannedHoursSum = 0;
+
+    var absenceHours = 0;
 
 
 function minToHour(val) { //Konverter et antal minutter til timer.
@@ -72,7 +75,10 @@ function addUIbutton() {
     button.innerText = "Time Beregninger";
     button.addEventListener("click", function() {
         calculateHours();
-        alert("(Morgenskift)\nTimer Brugt: " + hoursMorning.toFixed(2) + " | Planlagte timer: " + plannedHoursMorning.toFixed(2) + " | Procent: " + (hoursMorning / plannedHoursMorning * 100).toFixed(2) + "\n\n(Aftenskift)\nTimer Brugt: " + hoursEvening.toFixed(2) + " | Planlagte timer: " + plannedHoursEvening.toFixed(2) + " | Procent: " + (hoursEvening / plannedHoursEvening * 100).toFixed(2) + "\n\n(Hele dagen)\nTimer Brugt: " + hoursSum.toFixed(2) + " | Planlagte timer: " + plannedHoursSum.toFixed(2) + " | Procent: " + (hoursSum / plannedHoursSum * 100).toFixed(2));
+        alert("(Morgenskift)\nTimer Brugt: " + hoursMorning.toFixed(2) + " | Planlagte Timer: " + plannedHoursMorning.toFixed(2) + " | Procent: " + (hoursMorning / plannedHoursMorning * 100).toFixed(2) + 
+        "\n\n(Aftenskift)\nTimer Brugt: " + hoursEvening.toFixed(2) + " | Planlagte Timer: " + plannedHoursEvening.toFixed(2) + " | Procent: " + (hoursEvening / plannedHoursEvening * 100).toFixed(2) + 
+        "\n\n(Hele dagen)\nTimer Brugt: " + hoursSum.toFixed(2) + " | Planlagte Timer: " + plannedHoursSum.toFixed(2) + " | Procent: " + (hoursSum / plannedHoursSum * 100).toFixed(2) + 
+        "\n\n(Fravær)\nTimer: " + absenceHours.toFixed(2) + " | Procent af Timer Brugt: " + (absenceHours / hoursSum * 100).toFixed(2));
     })
 
     object.appendChild(button);
@@ -84,6 +90,7 @@ function calculateHours() { //Lav de nødvendige beregninger, og send manageren 
 
     var punches = document.getElementsByClassName("schedulerPunch"); //Indstemplinger.
     var shifts = document.getElementsByClassName("scheduler-shift"); //Planlagte vagter.
+    var absence = document.getElementsByClassName("schedulerAbsence__content"); //Vagter med fravær.
     
     hoursMorning = 0; //Antal timer brugt om morgenen.
     hoursEvening = 0; //Antal timer brugt om aftenen.
@@ -92,6 +99,8 @@ function calculateHours() { //Lav de nødvendige beregninger, og send manageren 
     plannedHoursMorning = 0;
     plannedHoursEvening = 0;
     plannedHoursSum = 0;
+
+    absenceHours = 0;
 
 for (var i = 0; i < punches.length;i++) { //Loopet finder ud af hvor mange timer der er brugt i løbet af dagen.
     if (punches[i].children[0].children[0].children[0].innerText != "Punch missing") {
@@ -148,6 +157,16 @@ for (var i = 0; i < shifts.length;i++) {
     }
 
     }
+}
+
+for (var i = 0; i < absence.length; i++) {
+    try {var timeFrames = absence[i].children[0].children[0].children[2].children[0].children[0].innerText.split(" ").join("").split("-");
+    console.log(timeFrames);
+
+    if (!compareArray(absence[i].children[0].children[0].children[1].innerText, settings.ignoredAbsence)) {
+        absenceHours += getDuration(timeFrames[0],timeFrames[1]);
+    }
+} catch {}
 }
 
 hoursSum = hoursMorning + hoursEvening;
