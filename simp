@@ -40,8 +40,6 @@ function HalfHourSales(tableElement) {
     }
 
     datStrings.forEach(el => {
-
-
         console.log(el);
     })
   }
