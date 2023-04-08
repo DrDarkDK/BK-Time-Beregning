@@ -30,7 +30,6 @@ function HalfHourSales(tableElement) {
 
       try {if (datStrings[datStrings.length-1].search(`${interval}`) >= 0) {datStrings.pop();}} catch {}
   
-        //console.log(`${interval}: Sum of sales = ${moneyValue.toFixed(2)}, Sum of all previous sales = ${salesSum.toFixed(2)}`);
         var res = `${interval}: Sum af salg = ${moneyValue.toFixed(2)}, Sum hele dagen = ${salesSum.toFixed(2)}`;
         if (res.search(":30 - ") >= 0) {
             var res = `${interval}: Sum af salg = ${moneyValue.toFixed(2)}, Sum hele dagen = ${salesSum.toFixed(2)}`;
