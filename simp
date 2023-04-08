@@ -1,0 +1,50 @@
+function HalfHourSales(tableElement) {
+    const rows = tableElement.querySelectorAll("tbody tr");
+    let salesSum = 0;
+    var datStrings = [];
+  
+    for (let i = 2; i < rows.length; i++) {
+      const timeCell = rows[i].querySelectorAll("td")[1];
+      const moneyCell = rows[i].querySelectorAll("td")[2];
+  
+      const time = timeCell.textContent.trim();
+      const moneyValue = parseFloat(moneyCell.textContent.replace(",", "").trim());
+  
+      const hour = parseInt(time.match(/\d{1,2}(?=:)/)[0], 10);
+      const minute = parseInt(time.match(/:(\d{2})/)[1], 10);
+      const isAM = /AM/i.test(time);
+      const is24Hour = !/AM|PM/i.test(time);
+  
+      const hour24 = (is24Hour || isAM) ? hour : (hour % 12) + 12;
+      let interval;
+  
+      if (minute <= 15) {
+        interval = `${hour24}:00 - ${hour24}:15`;
+      } else if (minute >= 30) {
+        interval = `${hour24}:30 - ${hour24}:45`;
+      } else {
+        continue;
+      }
+  
+      salesSum += moneyValue;
+
+      try {if (datStrings[datStrings.length-1].search(`${interval}`) >= 0) {datStrings.pop();}} catch {}
+  
+        //console.log(`${interval}: Sum of sales = ${moneyValue.toFixed(2)}, Sum of all previous sales = ${salesSum.toFixed(2)}`);
+        var res = `${interval}: Sum af salg = ${moneyValue.toFixed(2)}, Sum hele dagen = ${salesSum.toFixed(2)}`;
+        if (res.search(":30 - ") >= 0) {
+            var res = `${interval}: Sum af salg = ${moneyValue.toFixed(2)}, Sum hele dagen = ${salesSum.toFixed(2)}`;
+        } else {
+            var res = `${interval}: Sum af salg = ${moneyValue.toFixed(2)}`;
+        }
+        datStrings.push(res);
+    }
+
+    datStrings.forEach(el => {
+
+
+        console.log(el);
+    })
+  }
+
+HalfHourSales(document.getElementsByClassName("oj-table-element oj-component-initnode")[3])
